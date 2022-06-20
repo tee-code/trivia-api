@@ -1,3 +1,4 @@
+
 import os
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -8,6 +9,31 @@ from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
 
+def format_categories(categories):
+
+    response = {}
+
+    for category in categories:
+        response[category.id] = category.type
+    
+    return response
+
+def paginate(request, data):
+
+    #Get query parameter --page
+    page = request.args.get('page',1, type=int)
+
+    start = (page - 1) * QUESTIONS_PER_PAGE
+
+    end = page * QUESTIONS_PER_PAGE
+
+    questions = [i.format() for i in data]
+
+    response = questions[start:end]
+
+    return response
+
+
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
@@ -17,17 +43,36 @@ def create_app(test_config=None):
     @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
     """
 
+    CORS(app, resources={r"/api/*": {"origin":"*"}})
+
     """
     @TODO: Use the after_request decorator to set Access-Control-Allow
     """
+
+    @app.after_request
+    def after_request(response):
+
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Autorization,true')
+        response.headers.add('Access-Control-Allow-Methods','GET,PUT,PATCH,POST,DELETE,OPTIONS')
+
+        return response
 
     """
     @TODO:
     Create an endpoint to handle GET requests
     for all available categories.
     """
+    @app.route('/categories')
+    def fetch_categories():
 
+        #fetch all categories
+        categories = Category.query.all()
 
+        return jsonify({
+            'status': True,
+            'categories': format_categories(categories)
+        })
+   
     """
     @TODO:
     Create an endpoint to handle GET requests for questions,
@@ -40,6 +85,33 @@ def create_app(test_config=None):
     ten questions per page and pagination at the bottom of the screen for three pages.
     Clicking on the page numbers should update the questions.
     """
+    @app.route('/questions')
+    def fetch_questions():
+
+        try:
+
+            #Get all questions
+            questions = Question.query.all()
+            #Get the total number of questions
+            lenOfQuestions = len(questions)
+
+            #Get all categories
+            categories = format_categories(Category.query.all())
+
+            return jsonify({
+                'status': True,
+                'questions': paginate(request, questions),
+                'totalQuestions': lenOfQuestions,
+                'categories': categories
+            })
+        except Exception as e:
+            # db.session.rollback()
+            print(e)
+            abort(402)
+            
+        finally:
+            # db.session.close()
+            pass
 
     """
     @TODO:
@@ -79,6 +151,30 @@ def create_app(test_config=None):
     categories in the left column will cause only questions of that
     category to be shown.
     """
+
+    @app.route('/categories/<int:id>/questions')
+    def fetch_category_questions(id):
+        
+        try:
+            #get category
+            category = Category.query.get(id)
+
+            if not category:
+                abort(404)
+            
+            questions = Question.query.filter_by(category=id).all()
+            lenOfQuestions = len(Question.query.all())
+
+            return jsonify({
+                'status': True,
+                'totalQuestions': lenOfQuestions,
+                'questions': paginate(request, questions),
+                'currentCategory': category.type
+            })
+        except Exception as e:
+            print(e)
+            abort(402)
+
 
     """
     @TODO:
