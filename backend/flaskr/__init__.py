@@ -1,9 +1,12 @@
 
+import json
 import os
+from typing import final
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
+from models import db
 
 from models import setup_db, Question, Category
 
@@ -101,17 +104,16 @@ def create_app(test_config=None):
             return jsonify({
                 'status': True,
                 'questions': paginate(request, questions),
-                'totalQuestions': lenOfQuestions,
+                'total_questions': lenOfQuestions,
                 'categories': categories
             })
         except Exception as e:
-            # db.session.rollback()
+            db.session.rollback()
             print(e)
             abort(402)
             
         finally:
-            # db.session.close()
-            pass
+            db.session.close()
 
     """
     @TODO:
@@ -120,6 +122,29 @@ def create_app(test_config=None):
     TEST: When you click the trash icon next to a question, the question will be removed.
     This removal will persist in the database and when you refresh the page.
     """
+    @app.route('/questions/<int:id>', methods=['DELETE'])
+    def delete_question(id):
+
+        try:
+            #FIND the question by id
+            question = Question.query.filter_by(id=id).one_or_none()
+
+            if question is None:
+                abort(404)
+
+            question.delete()
+
+            return jsonify({
+                'success': True,
+                'deleted': id
+            })
+
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            abort(422)
+        finally:
+            db.session.close()
 
     """
     @TODO:
@@ -132,6 +157,51 @@ def create_app(test_config=None):
     of the questions list in the "List" tab.
     """
 
+    @app.route('/questions', methods=['POST'])
+    def create_question():
+
+        # get all data from request
+        data = request.get_json()
+
+        #validate the request data since all fields are required
+        if not ('question' in data and 'answer' in data and
+                'difficulty' in data and 'category' in data):
+            abort(422)
+        
+        #check for emptiness
+        for i in data:
+            if data[i] == '' or data[i] == None:
+                abort(422)
+        
+        #Get the values from request
+
+        question = data['question']
+        answer = data['answer']
+        difficulty = data['difficulty']
+        category = data['category']
+
+        try:
+            #Create a new question
+            question = Question(question=question, answer=answer,
+                                difficulty=difficulty,
+                                category=category)
+            question.insert()
+
+            # get all questions and paginate
+            selection = Question.query.order_by(Question.id).all()
+            current_questions = paginate(request, selection)
+
+            return jsonify({
+                'success': True,
+                'message': 'Question added successfully'
+            })
+        except:
+            db.session.rollback()
+            abort(422)
+        finally:
+            db.session.close()
+
+
     """
     @TODO:
     Create a POST endpoint to get questions based on a search term.
@@ -142,6 +212,28 @@ def create_app(test_config=None):
     only question that include that string within their question.
     Try using the word "title" to start.
     """
+
+    @app.route('/questions/search', methods=['POST'])
+    def search_question():
+
+        term = request.get_json().get('searchTerm', None)
+
+        try:
+            
+            questions = Question.query.filter(Question.question.ilike(f"%{term}%")).all()
+
+            return jsonify({
+                'status': True,
+                'questions': paginate(request,questions),
+                'total_questions': len(questions),
+                'current_category': None
+            })
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            abort(422)
+        finally:
+            db.session.close()
 
     """
     @TODO:
@@ -167,13 +259,13 @@ def create_app(test_config=None):
 
             return jsonify({
                 'status': True,
-                'totalQuestions': lenOfQuestions,
+                'total_questions': lenOfQuestions,
                 'questions': paginate(request, questions),
-                'currentCategory': category.type
+                'current_category': category.type
             })
         except Exception as e:
             print(e)
-            abort(402)
+            abort(422)
 
 
     """
@@ -187,12 +279,88 @@ def create_app(test_config=None):
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not.
     """
+    @app.route('/quizzes', methods=['POST'])
+    def get_quiz():
+
+        try:
+            data = request.get_json()
+
+            category = data.get('quiz_category', None)
+            previous_questions = data.get('previous_questions', None)
+
+            if category == None or previous_questions == None:
+                abort(422)
+
+            #Check when all questions is selected
+            if category['type'] == 'click' and category['id'] == 0:
+                questions = Question.query.filter(Question.id.notin_((previous_questions))).all()
+
+            # Filter out by category selected
+            else:
+                category_id = category['id']
+                questions = Question.query.filter_by(category=category_id).filter(Question.id.notin_((previous_questions))).all()
+
+            #now let play the game by selecting questions that are available
+
+            if not len(questions):
+                response = None
+            else:
+                choice = random.randrange(0, len(questions))
+                response = questions[choice].format()
+        
+            return jsonify({
+                'success': True,
+                'question': response
+            })
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            abort(422)
+        finally:
+            db.session.close()
 
     """
     @TODO:
     Create error handlers for all expected errors
     including 404 and 422.
     """
+
+    @app.errorhandler(400)
+    def bad_request(error):
+
+        return jsonify({
+            'status': False,
+            'error': 400,
+            'message': 'Bad request'
+        }),400
+
+    @app.errorhandler(404)
+    def not_found_request(error):
+
+        return jsonify({
+            'status': False,
+            'error': 404,
+            'message': 'Not found.'
+        }),404
+
+    @app.errorhandler(422)
+    def unprocessable_request(error):
+
+        return jsonify({
+            'status': False,
+            'error': 422,
+            'message': 'Unprocessable request' 
+        }), 422
+
+    @app.errorhandler(500)
+    def server_error_request(error):
+        
+        return jsonify({
+            'status': False,
+            'error': 500,
+            'message': 'Internal Server Error'
+        }), 500
+
 
     return app
 
