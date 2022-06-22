@@ -35,8 +35,7 @@ class QuizView extends Component {
   }
 
   selectCategory = ({ type, id = 0 }) => {
-    this.setState({ quizCategory: { type, id } }, this.getNextQuestion);
-    
+    this.setState({ quizCategory: { type, id } }, this.getNextQuestion); 
   };
 
   handleChange = (event) => {
@@ -44,6 +43,7 @@ class QuizView extends Component {
   };
 
   getNextQuestion = () => {
+
     const previousQuestions = [...this.state.previousQuestions];
     if (this.state.currentQuestion.id) {
       previousQuestions.push(this.state.currentQuestion.id);
