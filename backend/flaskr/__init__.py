@@ -1,6 +1,7 @@
 
 import json
 import os
+from tkinter.messagebox import RETRY
 from typing import final
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -72,7 +73,7 @@ def create_app(test_config=None):
         categories = Category.query.all()
 
         return jsonify({
-            'status': True,
+            'success': True,
             'categories': format_categories(categories)
         })
    
@@ -90,27 +91,31 @@ def create_app(test_config=None):
     """
     @app.route('/questions')
     def fetch_questions():
+        
+        #Get all questions
+        questions = Question.query.all()
+        #Get the total number of questions
+        lenOfQuestions = len(questions)
+        paginated_result = paginate(request, questions)
+        
+        if not paginated_result:
+            abort(404)
 
         try:
-
-            #Get all questions
-            questions = Question.query.all()
-            #Get the total number of questions
-            lenOfQuestions = len(questions)
 
             #Get all categories
             categories = format_categories(Category.query.all())
 
             return jsonify({
-                'status': True,
-                'questions': paginate(request, questions),
+                'success': True,
+                'questions': paginated_result,
                 'total_questions': lenOfQuestions,
                 'categories': categories
             })
         except Exception as e:
             db.session.rollback()
             print(e)
-            abort(402)
+            abort(422)
             
         finally:
             db.session.close()
@@ -187,10 +192,6 @@ def create_app(test_config=None):
                                 category=category)
             question.insert()
 
-            # get all questions and paginate
-            selection = Question.query.order_by(Question.id).all()
-            current_questions = paginate(request, selection)
-
             return jsonify({
                 'success': True,
                 'message': 'Question added successfully'
@@ -218,16 +219,20 @@ def create_app(test_config=None):
 
         term = request.get_json().get('searchTerm', None)
 
+        if not term:
+            abort(404)
+
         try:
             
             questions = Question.query.filter(Question.question.ilike(f"%{term}%")).all()
 
             return jsonify({
-                'status': True,
+                'success': True,
                 'questions': paginate(request,questions),
                 'total_questions': len(questions),
                 'current_category': None
             })
+
         except Exception as e:
             print(e)
             db.session.rollback()
@@ -247,22 +252,24 @@ def create_app(test_config=None):
     @app.route('/categories/<int:id>/questions')
     def fetch_category_questions(id):
         
-        try:
-            #get category
-            category = Category.query.get(id)
+        #get category
+        category = Category.query.filter_by(id=id).one_or_none()
 
-            if not category:
-                abort(404)
+        if category is None:
+            abort(404)
+
+        try:
             
             questions = Question.query.filter_by(category=id).all()
             lenOfQuestions = len(Question.query.all())
 
             return jsonify({
-                'status': True,
+                'success': True,
                 'total_questions': lenOfQuestions,
                 'questions': paginate(request, questions),
                 'current_category': category.type
             })
+
         except Exception as e:
             print(e)
             abort(422)
@@ -329,7 +336,7 @@ def create_app(test_config=None):
     def bad_request(error):
 
         return jsonify({
-            'status': False,
+            'success': False,
             'error': 400,
             'message': 'Bad request'
         }),400
@@ -338,7 +345,7 @@ def create_app(test_config=None):
     def not_found_request(error):
 
         return jsonify({
-            'status': False,
+            'success': False,
             'error': 404,
             'message': 'Not found.'
         }),404
@@ -347,7 +354,7 @@ def create_app(test_config=None):
     def unprocessable_request(error):
 
         return jsonify({
-            'status': False,
+            'success': False,
             'error': 422,
             'message': 'Unprocessable request' 
         }), 422
@@ -356,7 +363,7 @@ def create_app(test_config=None):
     def server_error_request(error):
         
         return jsonify({
-            'status': False,
+            'success': False,
             'error': 500,
             'message': 'Internal Server Error'
         }), 500
