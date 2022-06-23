@@ -1,7 +1,32 @@
-.form-view > label {
-  padding: 0px 0px 10px;
+.form-view>div>label {
+    padding: 0px 0px 10px;
+    width: 100%;
+    display: block;
+}
+
+.form-view>div {
+    width: 100%;
+    text-align: left;
+    margin-top: 1rem;
+}
+
+.form-view>div>input,
+.form-view>div>select {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    border: 2px ridge #ED273F;
+}
+
+.form-view>input {
+    padding: 1rem;
+    background-color: #ED273F;
+    color: white;
+    border: none;
 }
 
 #add-form {
-  text-align: center;
+    text-align: center;
+    padding: 1rem;
 }

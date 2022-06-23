@@ -1,75 +1,112 @@
 .question-view {
-  display: flex;
-  flex-direction: row;
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
 }
 
 .categories-list {
-  flex-basis: 25%;
-  flex-shrink: 2;
+    flex-basis: 15%;
+    flex-shrink: 2;
+    background-color: #ED273F;
+    color: white;
+    border-top: 1px dashed white;
 }
 
-.categories-list > form {
-  width: 60%;
+.categories-list h4 {
+    padding: 1rem;
+    background-color: whitesmoke;
+    margin-top: -.1rem;
+    color: #3c4858;
+    opacity: 1;
+    box-shadow: 0 4px 20px 0 rgb(0 0 0 / 14%), 0 7px 10px -5px rgb(60 72 88 / 40%);
+}
+
+.categories-list ul li {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: .7rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.categories-list ul li img {
+    margin-right: .4rem;
+}
+
+.categories-list>form {
+    width: 100%;
+}
+
+.categories-list form input {
+    padding: 1rem;
 }
 
 .questions-list {
-  flex-basis: 75%;
-  text-align: center;
+    flex-basis: 85%;
+    text-align: center;
+}
+
+.container {
+    width: 75%;
+    margin: auto;
 }
 
 .Question-holder {
-  padding: 10px 20px;
-  border: 2px black solid;
-  text-align: left;
-  margin: 7px;
+    padding: 10px 20px;
+    border-left: 4px #ED273F inset;
+    text-align: left;
+    margin: 7px;
+    opacity: 1;
+    box-shadow: 0 4px 20px 0 rgb(0 0 0 / 14%), 0 7px 10px -5px rgb(60 72 88 / 40%);
 }
 
 .Question-status {
-  display: flex;
-  flex-direction: row;
-  height: 30px;
-  width: 200px;
-  align-items: center;
-  justify-content: space-between;
+    display: flex;
+    flex-direction: row;
+    height: 30px;
+    width: 200px;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .Question {
-  font-size: 21px;
-  width: 100%;
+    font-size: 21px;
+    width: 100%;
 }
 
 .answer-holder {
-  font-size: 25px;
-  height: 25px;
-  margin: 5px 0px;
+    font-size: 25px;
+    height: 25px;
+    margin: 5px 0px;
 }
 
 .show-answer {
-  width: 100px;
-  margin-top: 5px;
-  background-color: dodgerblue;
-  color: white;
-  padding: 3px 5px;
-  margin-left: 0px !important;
+    width: 100px;
+    margin-top: 5px;
+    background-color: dodgerblue;
+    color: white;
+    padding: 3px 5px;
+    margin-left: 0px !important;
 }
 
 span.page-num {
-  margin: 5px;
-  padding-bottom: 50px;
-  /* color: blue; */
-  font-weight: bolder;
-  text-decoration: underline;
-  font-size: 16px;
+    margin: 5px;
+    padding-bottom: 50px;
+    /* color: blue; */
+    font-weight: bolder;
+    text-decoration: underline;
+    font-size: 16px;
 }
 
 span.page-num.active {
-  color: blue;
+    color: #ED273F;
 }
 
 img.category {
-  width: 30px;
+    width: 20px;
 }
 
 img.delete {
-  width: 20px;
+    width: 20px;
 }

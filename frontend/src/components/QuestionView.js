@@ -130,13 +130,13 @@ class QuestionView extends Component {
     return (
       <div className='question-view'>
         <div className='categories-list'>
-          <h2
+          <h4
             onClick={() => {
               this.getQuestions();
             }}
           >
-            Categories
-          </h2>
+            ALL CATEGORIES
+          </h4>
           <ul>
             {Object.keys(this.state.categories).map((id) => (
               <li
@@ -145,30 +145,34 @@ class QuestionView extends Component {
                   this.getByCategory(id);
                 }}
               >
-                {this.state.categories[id]}
                 <img
                   className='category'
                   alt={`${this.state.categories[id].toLowerCase()}`}
                   src={`${this.state.categories[id].toLowerCase()}.svg`}
                 />
+                {this.state.categories[id]}
+                
               </li>
             ))}
           </ul>
           <Search submitSearch={this.submitSearch} />
         </div>
         <div className='questions-list'>
-          <h2>Questions</h2>
-          {this.state.questions.map((q, ind) => (
-            <Question
-              key={q.id}
-              question={q.question}
-              answer={q.answer}
-              category={this.state.categories[q.category]}
-              difficulty={q.difficulty}
-              questionAction={this.questionAction(q.id)}
-            />
-          ))}
-          <div className='pagination-menu'>{this.createPagination()}</div>
+          <div className='container'>
+            <h2>Questions</h2>
+            {this.state.questions.map((q, ind) => (
+              <Question
+                key={q.id}
+                question={q.question}
+                answer={q.answer}
+                category={this.state.categories[q.category]}
+                difficulty={q.difficulty}
+                questionAction={this.questionAction(q.id)}
+              />
+            ))}
+            <div className='pagination-menu'>{this.createPagination()}</div>
+          </div>
+          
         </div>
       </div>
     );

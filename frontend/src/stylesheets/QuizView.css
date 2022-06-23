@@ -5,37 +5,59 @@
     margin-top: 40px;
 }
 
+.quiz-play-holder>form>input {
+    padding: 1rem;
+    background-color: #ED273F;
+    color: white;
+    border: none;
+}
+
 .category-holder {
     margin-top: 16px;
     font-size: 24px;
+    background-color: #ED273F;
+    color: white;
 }
 
 .choose-header {
-    font-size: 34px;
-    font-weight: bold;
+    font-size: 2rem;
+    background-color: #ED273F;
+    color: white;
+    padding: 1rem;
 }
 
 .play-category:hover {
     color: dodgerblue;
+    border-radius: 100%;
+    cursor: pointer;
 }
 
 .button {
-    width: 100px;
+    width: 100%;
     margin-top: 5px;
-    background-color: dodgerblue;
-    color: white;
+    background-color: white;
+    color: #ED273F;
     padding: 3px 5px;
     align-self: center;
+    border-radius: 100px;
+    font-weight: bold;
+    border: 2px ridge white;
+    cursor: pointer;
 }
 
 div.button {
     margin-top: 20px;
     margin-left: calc(50% - 50px);
+    background-color: #ED273F;
+    color: white;
+    font-weight: normal;
+    border: none;
+    cursor: pointer;
+    text-align: center;
 }
 
 .quiz-question {
     margin: 12px;
-    font-size: 24px;
 }
 
 .correct {

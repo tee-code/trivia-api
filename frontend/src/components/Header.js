@@ -14,29 +14,33 @@ class Header extends Component {
             this.navTo('');
           }}
         >
-          Udacitrivia
+          {/* Udacitrivia */}
+          Trivia
         </h1>
-        <h2
+        <ul className='nav'>
+        <li
           onClick={() => {
             this.navTo('');
           }}
         >
           List
-        </h2>
-        <h2
+        </li>
+        <li
           onClick={() => {
             this.navTo('/add');
           }}
         >
           Add
-        </h2>
-        <h2
+        </li>
+        <li
           onClick={() => {
             this.navTo('/play');
           }}
         >
           Play
-        </h2>
+        </li>
+        </ul>
+        
       </div>
     );
   }

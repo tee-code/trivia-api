@@ -24,7 +24,7 @@ class Question extends Component {
             alt={`${category.toLowerCase()}`}
             src={`${category.toLowerCase()}.svg`}
           />
-          <div className='difficulty'>Difficulty: {difficulty}</div>
+          <div className='difficulty'>DIFFICULTY: {difficulty}</div>
           <img
             src='delete.png'
             alt='delete'
@@ -32,20 +32,21 @@ class Question extends Component {
             onClick={() => this.props.questionAction('DELETE')}
           />
         </div>
-        <div
-          className='show-answer button'
-          onClick={() => this.flipVisibility()}
-        >
-          {this.state.visibleAnswer ? 'Hide' : 'Show'} Answer
-        </div>
+        
         <div className='answer-holder'>
           <span
             style={{
               visibility: this.state.visibleAnswer ? 'visible' : 'hidden',
             }}
           >
-            Answer: {answer}
+            ANSWER: {answer}
           </span>
+        </div>
+        <div
+          className='show-answer button btn'
+          onClick={() => this.flipVisibility()}
+        >
+          {this.state.visibleAnswer ? 'Hide' : 'Show'} Answer
         </div>
       </div>
     );

@@ -1,0 +1,19 @@
+/*  Additional CSS */
+
+ul.nav {
+    display: flex;
+    justify-content: right;
+    flex-grow: 8;
+    color: white;
+}
+
+ul.nav li {
+    padding: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    background-color: #ED273F;
+}
+
+ul.nav li:hover {
+    background-color: #EF3C52;
+}
