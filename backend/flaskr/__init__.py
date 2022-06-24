@@ -1,6 +1,4 @@
 
-import json
-import os
 from tkinter.messagebox import RETRY
 from typing import final
 from flask import Flask, request, abort, jsonify
@@ -131,6 +129,7 @@ def create_app(test_config=None):
     def delete_question(id):
 
         try:
+
             #FIND the question by id
             question = Question.query.filter_by(id=id).one_or_none()
 
